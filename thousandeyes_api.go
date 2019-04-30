@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 )
@@ -67,24 +66,34 @@ func thousandEyesDateTime() string {
 }
 
 func (t *thousandEyes) getAlerts() (ThousandAlerts, error) {
+
+	var a ThousandAlerts
+
 	client := &http.Client{}
-	url := string("https://api.thousandeyes.com/v6/alerts?format=json&from=" + thousandEyesDateTime())
+
+	url := string("https://api.thousandeyes.com/v6/alerts?format=json")
+	if retrospectionPeriod.Seconds() > 0 {
+		url += "&from=" + thousandEyesDateTime()
+	}
+
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", "Bearer "+t.token)
+	req.Header.Add("Content-Type", "application/json")
 	resp, err := client.Do(req)
-	if err != nil {
-		fmt.Print(err.Error())
+	if err != nil || resp.StatusCode != 200 {
+		return a, fmt.Errorf("ThousandEyes API Request failed: %s / http code: %d", err, resp.StatusCode)
 	}
-	// TODO return error if http errors occur
 	defer resp.Body.Close()
 
 	responseData, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		log.Print(err.Error())
+		return a, err
 	}
-
-	var a ThousandAlerts
-	json.Unmarshal(responseData, &a)
+	err = json.Unmarshal(responseData, &a)
+	if err != nil {
+		fmt.Print(err.Error())
+		return a, fmt.Errorf("parse configuration: %s", err.Error())
+	}
 	return a, nil
 
 }
