@@ -18,4 +18,4 @@ You can set the period of time it queries into the past with `-retrospectionPeri
 `docker run --rm -p 9350:9350 -e "THOUSANDEYES_TOKEN=  secret_api_bearer_token  " $(IMAGE):$(VERSION)`
 
 - _Run getting alerts from the past - makes only sense for Check/Debug purpose:_
-`docker run --rm -p 9350:9350 -e "THOUSANDEYES_TOKEN=  secret_api_bearer_token " $(IMAGE):$(VERSION) 1800h`
+`docker run --rm -p 9350:9350 -e "THOUSANDEYES_TOKEN=  secret_api_bearer_token " $(IMAGE):$(VERSION) retrospectionPeriod=1800h`

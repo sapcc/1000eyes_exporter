@@ -16,7 +16,7 @@ var (
 	thousandAlertsDesc = prometheus.NewDesc(
 		"thousandeyes_alerts",
 		"Alert triggered in ThousandEyes.",
-		[]string{"alert_id", "permalink", "test_name", "type"},
+		[]string{"test_name", "type", "violation_count", "rule_name", "rule_expression"},
 		nil)
 
 	// fixed metrics
@@ -69,7 +69,13 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			thousandAlertsDesc,
 			prometheus.GaugeValue,
 			float64(a[i].Active),
-			fmt.Sprintf("%d", a[i].AlertID), a[i].Permalink, a[i].TestName, a[i].Type,
+			//fmt.Sprintf("%d", a[i].AlertID),
+			//a[i].Permalink,
+			a[i].TestName,
+			a[i].Type,
+			fmt.Sprintf("%d", a[i].ViolationCount),
+			a[i].RuleName,
+			a[i].RuleExpression,
 		)
 	}
 }
