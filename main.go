@@ -14,9 +14,9 @@ import (
 var (
 	// dynamic metrics
 	thousandAlertsDesc = prometheus.NewDesc(
-		"thousandeyes_alerts",
+		"thousandeyes_alert_reachability_ratio",
 		"Alert triggered in ThousandEyes.",
-		[]string{"test_name", "type", "violation_count", "rule_name", "rule_expression"},
+		[]string{"test_name", "type", "rule_name", "rule_expression"},
 		nil)
 
 	// fixed metrics
@@ -65,15 +65,15 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	}
 	a := t.Alert
 	for i := range a {
+
+		rr := 1 - (a[i].ViolationCount / len(a[i].Monitors))
+
 		ch <- prometheus.MustNewConstMetric(
 			thousandAlertsDesc,
 			prometheus.GaugeValue,
-			float64(a[i].Active),
-			//fmt.Sprintf("%d", a[i].AlertID),
-			//a[i].Permalink,
+			float64(rr),
 			a[i].TestName,
 			a[i].Type,
-			fmt.Sprintf("%d", a[i].ViolationCount),
 			a[i].RuleName,
 			a[i].RuleExpression,
 		)

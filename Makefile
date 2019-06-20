@@ -1,5 +1,5 @@
 IMAGE:=hub.global.cloud.sap/monsoon/1000eyes-exporter
-VERSION:=v0.0.1
+VERSION:=v0.0.2
 
 build:
 	go get
