@@ -14,8 +14,13 @@ import (
 var (
 	// dynamic metrics
 	thousandAlertsDesc = prometheus.NewDesc(
+		"thousandeyes_alert",
+		"triggered / active alerts for a rule in ThousandEyes.",
+		[]string{"test_name", "type", "rule_name", "rule_expression"},
+		nil)
+	thousandAlertsReachabilitySuccessRatioDesc = prometheus.NewDesc(
 		"thousandeyes_alert_reachability_ratio",
-		"Alert triggered in ThousandEyes.",
+		"Reachability Success Ratio Gauge defined by: 1 - ViolationCount / MonitorCount ",
 		[]string{"test_name", "type", "rule_name", "rule_expression"},
 		nil)
 
@@ -52,6 +57,7 @@ type collector struct {
 
 func (c *collector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- thousandAlertsDesc
+	ch <- thousandAlertsReachabilitySuccessRatioDesc
 }
 
 func (c collector) Collect(ch chan<- prometheus.Metric) {
@@ -69,9 +75,19 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		rr := 1 - (a[i].ViolationCount / len(a[i].Monitors))
 
 		ch <- prometheus.MustNewConstMetric(
-			thousandAlertsDesc,
+			thousandAlertsReachabilitySuccessRatioDesc,
 			prometheus.GaugeValue,
 			float64(rr),
+			a[i].TestName,
+			a[i].Type,
+			a[i].RuleName,
+			a[i].RuleExpression,
+		)
+
+		ch <- prometheus.MustNewConstMetric(
+			thousandAlertsDesc,
+			prometheus.GaugeValue,
+			float64(a[i].Active),
 			a[i].TestName,
 			a[i].Type,
 			a[i].RuleName,
