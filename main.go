@@ -33,6 +33,10 @@ var (
 		Name: "thousandeyes_requests_fails",
 		Help: "The number requests failed against ThousandEyes API.",
 	})
+	thousandRequestParsingFailMetric = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "thousandeyes_parsing_fails",
+		Help: "The number request parsing failed.",
+	})
 	thousandRequestsetRospectionPeriodMetric = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "thousandeyes_retrospection_period_seconds",
 		Help: "The number of seconds into the past we query ThousandEyes for.",
@@ -62,6 +66,13 @@ func (c *collector) Describe(ch chan<- *prometheus.Desc) {
 
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 
+	defer func() {
+		if r := recover(); r != nil {
+			thousandRequestParsingFailMetric.Inc()
+			log.Println("Thousand Eyes Parsing Error (", r, ").")
+		}
+	}()
+
 	t, err := c.thousandEyes.getAlerts()
 	thousandRequestsTotalMetric.Inc()
 
@@ -72,18 +83,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	a := t.Alert
 	for i := range a {
 
-		rr := 1 - (a[i].ViolationCount / len(a[i].Monitors))
-
-		ch <- prometheus.MustNewConstMetric(
-			thousandAlertsReachabilitySuccessRatioDesc,
-			prometheus.GaugeValue,
-			float64(rr),
-			a[i].TestName,
-			a[i].Type,
-			a[i].RuleName,
-			a[i].RuleExpression,
-		)
-
+		// alert metrics
 		ch <- prometheus.MustNewConstMetric(
 			thousandAlertsDesc,
 			prometheus.GaugeValue,
@@ -93,6 +93,25 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			a[i].RuleName,
 			a[i].RuleExpression,
 		)
+
+		// thousandeyes_parsing_fails
+		mC := len(a[i].Monitors)
+		if mC == 0 {
+			log.Println("Alert Monitor Array is empty - skip thousandeyes_parsing_fails")
+		} else {
+			rr := 1 - (a[i].ViolationCount / mC)
+
+			ch <- prometheus.MustNewConstMetric(
+				thousandAlertsReachabilitySuccessRatioDesc,
+				prometheus.GaugeValue,
+				float64(rr),
+				a[i].TestName,
+				a[i].Type,
+				a[i].RuleName,
+				a[i].RuleExpression,
+			)
+		}
+
 	}
 }
 
@@ -114,6 +133,7 @@ func main() {
 	prometheus.Register(collector)
 	prometheus.MustRegister(thousandRequestsTotalMetric)
 	prometheus.MustRegister(thousandRequestsFailMetric)
+	prometheus.MustRegister(thousandRequestParsingFailMetric)
 	prometheus.MustRegister(thousandRequestsetRospectionPeriodMetric)
 	thousandRequestsetRospectionPeriodMetric.Set(retrospectionPeriod.Seconds())
 
