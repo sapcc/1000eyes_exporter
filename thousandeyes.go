@@ -15,11 +15,7 @@ const (
 	apiURLTestHTTPMetrics = "https://api.thousandeyes.com/v6/net/metrics/%d.json"
 )
 
-const (
-	alerts = iota
-)
-
-// ThousandeyesRequest bla
+// ThousandeyesRequest the request struct
 type ThousandeyesRequest struct {
 	URL            string
 	ResponseCode   int
@@ -35,7 +31,7 @@ type ThousandAlerts struct {
 		AlertID   int    `json:"alertId"`
 		DateEnd   string `json:"dateEnd,omitempty"`
 		DateStart string `json:"dateStart"`
-		Monitors  []struct {
+		Monitors  []struct { //array of monitors where the alert has at some point been active since the point that the alert was triggered. Only shown on BGP alerts.
 			Active         int    `json:"active"`
 			MetricsAtStart string `json:"metricsAtStart"`
 			MetricsAtEnd   string `json:"metricsAtEnd"`
@@ -60,7 +56,7 @@ type ThousandAlerts struct {
 			Rel  string `json:"rel"`
 			Href string `json:"href"`
 		} `json:"apiLinks,omitempty"`
-		Agents []struct {
+		Agents []struct { //array of monitors where the alert has at some point been active since the point that the alert was triggered. Not shown on BGP alerts.
 			Active         int    `json:"active"`
 			MetricsAtStart string `json:"metricsAtStart"`
 			MetricsAtEnd   string `json:"metricsAtEnd"`
@@ -159,42 +155,34 @@ func thousandEyesDateTime() string {
 	return string(f)
 }
 
-func (t *thousandEyes) GetAlerts() (ThousandAlerts, error) {
+func (t *thousandEyes) GetAlerts() (ThousandAlerts, bool, bool ) {
 
 	r := ThousandeyesRequest{
 		URL:            apiURLalerts,
 		ResponseObject: new(ThousandAlerts),
 	}
 
-	CallSingle(t.token, &r)
+	bHitAPILimit, bError := CallSingle(t.token, &r)
 
-	if r.Error != nil {
-		return r.ResponseObject.(ThousandAlerts), r.Error
-	}
-
-	return r.ResponseObject.(ThousandAlerts), nil
+	return *r.ResponseObject.(*ThousandAlerts), bHitAPILimit, bError
 }
 
-func (t *thousandEyes) GetTests() ([]BGPTestResults, []HTTPTestMetricResults, []HTTPTestWebServerResults, error) {
-
-	var httpMs []HTTPTestMetricResults
-	var httpWs []HTTPTestWebServerResults
-	var bgpMs []BGPTestResults
+func (t *thousandEyes) GetTests() ( bgpMs []BGPTestResults, httpMs []HTTPTestMetricResults, httpWs []HTTPTestWebServerResults, bHitAPILimit bool, bError bool) {
 
 	rTests := ThousandeyesRequest{
 		URL:            apiURLTests,
 		ResponseObject: new(ThousandTests),
 	}
-	CallSingle(t.token, &rTests)
+	bHitAPILimit, bError = CallSingle(t.token, &rTests)
 	if rTests.Error != nil {
-		return bgpMs, httpMs, httpWs, rTests.Error
+		return bgpMs, httpMs, httpWs, bHitAPILimit, bError
 	}
 
 	te := rTests.ResponseObject.(*ThousandTests)
 
 	var testRequests []ThousandeyesRequest
 
-	log.Println(fmt.Sprintf("Test Count: %d", len(te.Tests)))
+	log.Println(fmt.Sprintf("INFO: Test Count: %d", len(te.Tests)))
 
 	for i := range te.Tests {
 		switch te.Tests[i].Type {
@@ -213,12 +201,12 @@ func (t *thousandEyes) GetTests() ([]BGPTestResults, []HTTPTestMetricResults, []
 				ResponseObject: new(BGPTestResults),
 			})
 		default:
-			log.Fatal(fmt.Sprintf("%s.\n", te.Tests[i].Type))
+			log.Println(fmt.Sprintf("ERROR: Not a handled test type: %s. Bug. Fix Code.", te.Tests[i].Type))
 		}
 	}
 
 	//CallSequence(t.token, testRequests)
-	CallParallel(t.token, testRequests)
+	bHitAPILimit, bError = CallParallel(t.token, testRequests)
 
 	for c, o := range testRequests {
 
@@ -232,9 +220,9 @@ func (t *thousandEyes) GetTests() ([]BGPTestResults, []HTTPTestMetricResults, []
 			case *HTTPTestWebServerResults:
 				httpWs = append(httpWs,*testRequests[c].ResponseObject.(*HTTPTestWebServerResults))
 			default:
-				log.Fatal(fmt.Sprintf("Not a handled test type %s (%d of %d). Bug. Fix Code.", reflect.TypeOf(o.ResponseObject), c, len(testRequests)))
+				log.Println(fmt.Sprintf("ERROR: Not a handled test type %s (%d of %d). Bug. Fix Code.", reflect.TypeOf(o.ResponseObject), c, len(testRequests)))
 		}
 	}
 
-	return bgpMs, httpMs, httpWs, nil
+	return bgpMs, httpMs, httpWs, bHitAPILimit, bError
 }

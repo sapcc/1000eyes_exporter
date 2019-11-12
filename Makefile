@@ -1,6 +1,6 @@
 IMAGE:=hub.global.cloud.sap/monsoon/1000eyes-exporter
-VERSION:=latest
-#VERSION:=v0.0.3
+VERSION_LATEST:=latest
+VERSION:=v0.0.4
 
 build:
 	go get
@@ -12,7 +12,9 @@ test:
 
 docker:
 	docker build -t $(IMAGE):$(VERSION) .
+	docker build -t $(IMAGE):$(VERSION_LATEST) .
 
 push:
 	docker push $(IMAGE):$(VERSION)
+	docker push $(IMAGE):$(VERSION_LATEST)
 
