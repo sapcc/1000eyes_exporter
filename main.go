@@ -21,7 +21,7 @@ func main() {
 	tc.token = os.Getenv("THOUSANDEYES_TOKEN")
 
 	if tc.token == "" {
-		log.Fatal("error: THOUSANDEYES_TOKEN must be set in the Environment Values - it's emptry.")
+		log.Fatal("error: THOUSANDEYES_TOKEN must be set in the Environment Values - it's empty.")
 	}
 
 	c := &collector{thousandEyes: tc}
