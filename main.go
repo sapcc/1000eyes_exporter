@@ -21,7 +21,7 @@ func main() {
 	tc.token = os.Getenv("THOUSANDEYES_TOKEN")
 
 	if tc.token == "" {
-		log.Fatal("error: THOUSANDEYES_TOKEN must be set in the Environment Values - it's emptry.")
+		log.Fatal("error: THOUSANDEYES_TOKEN must be set in the Environment Values - it's empty.")
 	}
 
 	c := &collector{thousandEyes: tc}
@@ -40,11 +40,11 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(
 			`<html>
-			<head><title>ThousandEyes Alert Exporter </title></head>
+			<head><title>ThousandEyes Alert Exporter</title></head>
 			<body>
 			<h1>ThousandEyes Alert Exporter</h1>
 			<p><a href="/metrics">Metrics</a></p>
-			<p><a href="https://github.com/sapcc/1000eyes_exporter"</a>Git Repository</p>
+			<p><a href="https://github.com/sapcc/1000eyes_exporter">Git Repository</a></p>
 			</body>
 			</html>`))
 	})
