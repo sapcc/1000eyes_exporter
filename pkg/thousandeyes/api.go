@@ -1,21 +1,20 @@
-package main
+package thousandeyes
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
 )
-var bHitRateLimit bool
-
 
 
 // CallSingle is a single URL call
 // it returns true, if the API Rate Limit was hit
 // the error & result object itself are modified in the Request struct
-func CallSingle(token string, request *ThousandeyesRequest) (bHitAPILimit bool, bError bool) {
+func CallSingle(token string, request *Request) (bHitAPILimit bool, bError bool) {
 
 	client := &http.Client{}
 	bHitAPILimit = false
@@ -34,7 +33,11 @@ func CallSingle(token string, request *ThousandeyesRequest) (bHitAPILimit bool, 
 		return
 	} else if err != nil || resp.StatusCode != 200 {
 		bError = true
-		request.Error = fmt.Errorf("ThousandEyes API Request failed: %s / http code: %d", err, resp.StatusCode)
+		if err == nil {
+			err = errors.New(resp.Status)
+		}
+		request.Error = fmt.Errorf("ThousandEyes API Request failed: %s / http code: %d (url: %s)", err, resp.StatusCode, req.URL)
+		log.Printf("ERROR: %s", request.Error)
 		return
 	}
 	defer resp.Body.Close()
@@ -58,7 +61,7 @@ func CallSingle(token string, request *ThousandeyesRequest) (bHitAPILimit bool, 
 // CallSequence does CallSingle calls one after the other
 // it returns true, if the API Rate Limit was hit
 // the error & result object itself are modified in the Request struct
-func CallSequence(token string, requests []ThousandeyesRequest) (bHitAPILimit bool, bError bool) {
+func CallSequence(token string, requests []Request) (bHitAPILimit bool, bError bool) {
 
 	bHitAPILimit = false
 
@@ -66,7 +69,7 @@ func CallSequence(token string, requests []ThousandeyesRequest) (bHitAPILimit bo
 
 		bHitAPILimit, bError = CallSingle(token, &requests[c])
 
-		if (bHitAPILimit) {
+		if bHitAPILimit {
 			return
 		}
 	}
@@ -77,12 +80,12 @@ func CallSequence(token string, requests []ThousandeyesRequest) (bHitAPILimit bo
 // CallParallel does CallSingle calls in parallel - can hit thousandeyes api restrictions easily
 // it returns true, if the API Rate Limit was hit
 // the error & result object itself are modified in the Request struct
-func CallParallel(token string, requests []ThousandeyesRequest) (bHitRateLimit bool, bError bool) {
+func CallParallel(token string, requests []Request) (bHitRateLimit bool, bError bool) {
 
 	var waitGroup sync.WaitGroup
 	var m sync.Mutex
 
-	httpChan := make(chan ThousandeyesRequest, len(requests))
+	httpChan := make(chan Request, len(requests))
 	bHitRateLimit = false;
 
 	for _, request := range requests {
@@ -91,7 +94,7 @@ func CallParallel(token string, requests []ThousandeyesRequest) (bHitRateLimit b
 
 		waitGroup.Add(1)
 
-		go func(token string, request ThousandeyesRequest, httpChan chan (ThousandeyesRequest), m *sync.Mutex) {
+		go func(token string, request Request, httpChan chan Request, m *sync.Mutex) {
 			defer waitGroup.Done()
 
 			//log.Println(fmt.Sprintf("URL: %s | API-Request-Limit-Hit ?: %t", request.URL, b))
@@ -102,7 +105,7 @@ func CallParallel(token string, requests []ThousandeyesRequest) (bHitRateLimit b
 			bError = bError || bE
 			m.Unlock()
 
-			if (bHitRateLimit){
+			if bHitRateLimit {
 				log.Println(fmt.Sprintf("ERROR: Skip Detail request (%s), bcz we hit the API Request Limit.", request.URL))
 				return
 			}

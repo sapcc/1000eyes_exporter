@@ -1,22 +1,30 @@
-package main
+package thousandeyes
 
 import (
 	"fmt"
 	"log"
-	"time"
 	"reflect"
+	"time"
 )
 
 const (
-	apiURLalerts          = "https://api.thousandeyes.com/v6/alerts?format=json"
+	apiURLAlerts          = "https://api.thousandeyes.com/v6/alerts?format=json"
 	apiURLTests           = "https://api.thousandeyes.com/v6/tests.json"
 	apiURLTestBGB         = "https://api.thousandeyes.com/v6/net/bgp-metrics/%d.json"
 	apiURLTestHTTP        = "https://api.thousandeyes.com/v6/web/http-server/%d.json"
 	apiURLTestHTTPMetrics = "https://api.thousandeyes.com/v6/net/metrics/%d.json"
 )
 
+//
+type RunConfig struct {
+	token string
+	bCollectBGPTests bool
+	bCollectHTTPTest bool
+	bCollectHTTPTestMetrics bool
+}
+
 // ThousandeyesRequest the request struct
-type ThousandeyesRequest struct {
+type Request struct {
 	URL            string
 	ResponseCode   int
 	ResponseObject interface{}
@@ -149,64 +157,74 @@ type HTTPTestWebServerResults struct {
 
 func thousandEyesDateTime() string {
 	// Go back a bit to have some alerts to parse
-	t := time.Now().UTC().Add(-*retrospectionPeriod)
+	t := time.Now().UTC().Add(-*RetrospectionPeriod)
 	// 2006-01-02T15:04:05 is a magic date to format dates using example based layouts
 	f := t.Format("2006-01-02T15:04:05")
 	return string(f)
 }
 
-func (t *thousandEyes) GetAlerts() (ThousandAlerts, bool, bool ) {
+func (t *Collector) GetAlerts() (ThousandAlerts, bool, bool ) {
 
-	r := ThousandeyesRequest{
-		URL:            apiURLalerts,
+	r := Request{
+		URL:            apiURLAlerts,
 		ResponseObject: new(ThousandAlerts),
 	}
 
-	bHitAPILimit, bError := CallSingle(t.token, &r)
+	bHitAPILimit, bError := CallSingle(t.Token, &r)
 
 	return *r.ResponseObject.(*ThousandAlerts), bHitAPILimit, bError
 }
 
-func (t *thousandEyes) GetTests() ( bgpMs []BGPTestResults, httpMs []HTTPTestMetricResults, httpWs []HTTPTestWebServerResults, bHitAPILimit bool, bError bool) {
+func (t *Collector) GetTests() (bgpMs []BGPTestResults, httpMs []HTTPTestMetricResults, httpWs []HTTPTestWebServerResults, bHitAPILimit, bError bool) {
 
-	rTests := ThousandeyesRequest{
+	rTests := Request{
 		URL:            apiURLTests,
 		ResponseObject: new(ThousandTests),
 	}
-	bHitAPILimit, bError = CallSingle(t.token, &rTests)
+	bHitAPILimit, bError = CallSingle(t.Token, &rTests)
 	if rTests.Error != nil {
 		return bgpMs, httpMs, httpWs, bHitAPILimit, bError
 	}
 
 	te := rTests.ResponseObject.(*ThousandTests)
 
-	var testRequests []ThousandeyesRequest
+	var testRequests []Request
 
 	log.Println(fmt.Sprintf("INFO: Test Count: %d", len(te.Tests)))
 
 	for i := range te.Tests {
 		switch te.Tests[i].Type {
 		case "http-server":
-			testRequests = append(testRequests, ThousandeyesRequest{
-				URL:            fmt.Sprintf(apiURLTestHTTP, te.Tests[i].TestID),
-				ResponseObject: new(HTTPTestWebServerResults),
-			})
-			testRequests = append(testRequests, ThousandeyesRequest{
-				URL:            fmt.Sprintf(apiURLTestHTTPMetrics, te.Tests[i].TestID),
-				ResponseObject: new(HTTPTestMetricResults),
-			})
+
+			if t.IsCollectHttp {
+				testRequests = append(testRequests, Request{
+					URL:            fmt.Sprintf(apiURLTestHTTP, te.Tests[i].TestID),
+					ResponseObject: new(HTTPTestWebServerResults),
+				})
+			}
+			if t.IsCollectHttpMetrics {
+				testRequests = append(testRequests, Request{
+					URL:            fmt.Sprintf(apiURLTestHTTPMetrics, te.Tests[i].TestID),
+					ResponseObject: new(HTTPTestMetricResults),
+				})
+			}
+
 		case "bgp":
-			testRequests = append(testRequests, ThousandeyesRequest{
-				URL:            fmt.Sprintf(apiURLTestBGB, te.Tests[i].TestID),
-				ResponseObject: new(BGPTestResults),
-			})
+
+			if t.IsCollectBgp {
+				testRequests = append(testRequests, Request{
+					URL:            fmt.Sprintf(apiURLTestBGB, te.Tests[i].TestID),
+					ResponseObject: new(BGPTestResults),
+				})
+			}
+
 		default:
 			log.Println(fmt.Sprintf("ERROR: Not a handled test type: %s. Bug. Fix Code.", te.Tests[i].Type))
 		}
 	}
 
 	//CallSequence(t.token, testRequests)
-	bHitAPILimit, bError = CallParallel(t.token, testRequests)
+	bHitAPILimit, bError = CallParallel(t.Token, testRequests)
 
 	for c, o := range testRequests {
 
