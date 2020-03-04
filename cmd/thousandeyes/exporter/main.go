@@ -34,25 +34,20 @@ func main() {
 		IsCollectHttpMetrics: *bGetHttpMetrics,
 	}
 	prometheus.Register(c)
-	prometheus.MustRegister(thousandeyes.ThousandRequestsTotalMetric)
-	prometheus.MustRegister(thousandeyes.ThousandRequestsFailMetric)
-	prometheus.MustRegister(thousandeyes.ThousandRequestParsingFailMetric)
-	prometheus.MustRegister(thousandeyes.ThousandRequestsetRospectionPeriodMetric)
-	prometheus.MustRegister(thousandeyes.ThousandRequestScrapingTime)
-	prometheus.MustRegister(thousandeyes.ThousandRequestAPILimitReached)
 
 	// make Prometheus client aware of our collector
 	thousandeyes.ThousandRequestsetRospectionPeriodMetric.Set(thousandeyes.RetrospectionPeriod.Seconds())
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(
+		_, _ = w.Write([]byte(
 			`<html>
 			<head><title>ThousandEyes Alert Exporter</title></head>
 			<body>
 			<h1>ThousandEyes Alert Exporter</h1>
 			<p><a href="/metrics">Metrics</a></p>
 			<p><a href="https://github.com/sapcc/1000eyes_exporter">Git Repository</a></p>
+			<p><a href="https://www.thousandeyes.com/">thousandeyes home</a></p>
 			</body>
 			</html>`))
 	})

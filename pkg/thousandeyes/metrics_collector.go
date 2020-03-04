@@ -196,9 +196,20 @@ func (t *Collector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- ThousandTestHTMLTotalTimeDesc
 	ch <- ThousandTestHTMLwaitTimeDesc
 	ch <- ThousandTestHTMLwireSizeDesc
+
+}
+func addStaticMetrics(ch chan<- prometheus.Metric){
+	ch <- ThousandRequestsTotalMetric
+	ch <- ThousandRequestsFailMetric
+	ch <- ThousandRequestParsingFailMetric
+	ch <- ThousandRequestsetRospectionPeriodMetric
+	ch <- ThousandRequestScrapingTime
+	ch <- ThousandRequestAPILimitReached
 }
 
 func collectAlerts(c Collector, ch chan<- prometheus.Metric) {
+
+	
 
 	ThousandRequestsTotalMetric.Inc()
 
@@ -252,6 +263,7 @@ func collectAlerts(c Collector, ch chan<- prometheus.Metric) {
 	}
 }
 func collectTests(c Collector, ch chan<- prometheus.Metric) {
+
 
 	tBGP, tHTMLm, tHTMLw, bHitRateLimit, bError := c.GetTests()
 	ThousandRequestsTotalMetric.Inc()
@@ -483,6 +495,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 }
 
 func (t Collector) Collect(ch chan<- prometheus.Metric) {
+	defer addStaticMetrics(ch)
 
 	scrapeStart := time.Now()
 
