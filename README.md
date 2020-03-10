@@ -23,6 +23,9 @@ set to a valid ThousandEyes token to be able to query.
 - `-GetBGP=true [true|false (default)]` if you want BGP test data collected
 - `-GetHTTP=true [true|false (default)]` if you want HTTP request test data collected (false is default if not set)
 - `-GetHttpMetrics=true [true|false (default)]` if you want HTTP routing test data collected (false is default if not set)
+
+    HINT: please be aware of the API request limit per minute .. if you have many tests and collect all details it's pretty sure that you're going to it. 
+
 - Just for debugging purpose: `-RetrospectionPeriod` You can set the period of time it queries into the past, e.g. `-RetrospectionPeriod 12h`. Large values do not make much sense, because we do not get data about when they started or ended. Just that they existed.
 
 # Docker
