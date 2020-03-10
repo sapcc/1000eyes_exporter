@@ -1,6 +1,7 @@
 package thousandeyes
 
 import (
+	//"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,14 +15,21 @@ import (
 // CallSingle is a single URL call
 // it returns true, if the API Rate Limit was hit
 // the error & result object itself are modified in the Request struct
-func CallSingle(token string, request *Request) (bHitAPILimit bool, bError bool) {
-
+func CallSingle(token string, user string, isBasicAuth bool, request *Request) (bHitAPILimit bool, bError bool) {
+	ThousandRequestsTotalMetric.Inc()
 	client := &http.Client{}
 	bHitAPILimit = false
 	bError = false
 
 	req, err := http.NewRequest("GET", request.URL, nil)
-	req.Header.Add("Authorization", "Bearer "+token)
+	if isBasicAuth {
+		//bt, _ := base64.StdEncoding.DecodeString(token)
+		req.SetBasicAuth(user,token)
+		//req.Header.Add("Authorization", "Basic "+string(bt) )
+
+	} else {
+		req.Header.Add("Authorization", "Bearer "+token)
+	}
 	req.Header.Add("Content-Type", "application/json")
 
 	//log.Println(fmt.Sprintf("CALL >>> Url: %s", request.URL))
@@ -61,13 +69,13 @@ func CallSingle(token string, request *Request) (bHitAPILimit bool, bError bool)
 // CallSequence does CallSingle calls one after the other
 // it returns true, if the API Rate Limit was hit
 // the error & result object itself are modified in the Request struct
-func CallSequence(token string, requests []Request) (bHitAPILimit bool, bError bool) {
+func CallSequence(token string, user string, isBasicAuth bool, requests []Request) (bHitAPILimit bool, bError bool) {
 
 	bHitAPILimit = false
 
 	for c := range requests {
 
-		bHitAPILimit, bError = CallSingle(token, &requests[c])
+		bHitAPILimit, bError = CallSingle(token, user, isBasicAuth, &requests[c])
 
 		if bHitAPILimit {
 			return
@@ -80,7 +88,7 @@ func CallSequence(token string, requests []Request) (bHitAPILimit bool, bError b
 // CallParallel does CallSingle calls in parallel - can hit thousandeyes api restrictions easily
 // it returns true, if the API Rate Limit was hit
 // the error & result object itself are modified in the Request struct
-func CallParallel(token string, requests []Request) (bHitRateLimit bool, bError bool) {
+func CallParallel(token string, user string, isBasicAuth bool, requests []Request) (bHitRateLimit bool, bError bool) {
 
 	var waitGroup sync.WaitGroup
 	var m sync.Mutex
@@ -94,12 +102,12 @@ func CallParallel(token string, requests []Request) (bHitRateLimit bool, bError 
 
 		waitGroup.Add(1)
 
-		go func(token string, request Request, httpChan chan Request, m *sync.Mutex) {
+		go func(token string, user string, isBasicAuth bool, request Request, httpChan chan Request, m *sync.Mutex) {
 			defer waitGroup.Done()
 
 			//log.Println(fmt.Sprintf("URL: %s | API-Request-Limit-Hit ?: %t", request.URL, b))
 
-			bL, bE := CallSingle(token, &request)
+			bL, bE := CallSingle(token, user, isBasicAuth, &request)
 			m.Lock()
 			bHitRateLimit = bHitRateLimit || bL
 			bError = bError || bE
@@ -112,7 +120,7 @@ func CallParallel(token string, requests []Request) (bHitRateLimit bool, bError 
 
 			httpChan <- request
 
-		}(token, request, httpChan, &m)
+		}(token, user, isBasicAuth, request, httpChan, &m)
 	}
 
 	waitGroup.Wait()

@@ -15,14 +15,6 @@ const (
 	apiURLTestHTTPMetrics = "https://api.thousandeyes.com/v6/net/metrics/%d.json"
 )
 
-//
-type RunConfig struct {
-	token string
-	bCollectBGPTests bool
-	bCollectHTTPTest bool
-	bCollectHTTPTestMetrics bool
-}
-
 // ThousandeyesRequest the request struct
 type Request struct {
 	URL            string
@@ -170,7 +162,7 @@ func (t *Collector) GetAlerts() (ThousandAlerts, bool, bool ) {
 		ResponseObject: new(ThousandAlerts),
 	}
 
-	bHitAPILimit, bError := CallSingle(t.Token, &r)
+	bHitAPILimit, bError := CallSingle(t.Token, t.User, t.IsBasicAuth, &r)
 
 	return *r.ResponseObject.(*ThousandAlerts), bHitAPILimit, bError
 }
@@ -181,7 +173,7 @@ func (t *Collector) GetTests() (bgpMs []BGPTestResults, httpMs []HTTPTestMetricR
 		URL:            apiURLTests,
 		ResponseObject: new(ThousandTests),
 	}
-	bHitAPILimit, bError = CallSingle(t.Token, &rTests)
+	bHitAPILimit, bError = CallSingle(t.Token, t.User, t.IsBasicAuth, &rTests)
 	if rTests.Error != nil {
 		return bgpMs, httpMs, httpWs, bHitAPILimit, bError
 	}
@@ -190,7 +182,7 @@ func (t *Collector) GetTests() (bgpMs []BGPTestResults, httpMs []HTTPTestMetricR
 
 	var testRequests []Request
 
-	log.Println(fmt.Sprintf("INFO: Test Count: %d", len(te.Tests)))
+	log.Println(fmt.Sprintf("INFO: ThousandEyes Test Count: %d", len(te.Tests)))
 
 	for i := range te.Tests {
 		switch te.Tests[i].Type {
@@ -224,7 +216,7 @@ func (t *Collector) GetTests() (bgpMs []BGPTestResults, httpMs []HTTPTestMetricR
 	}
 
 	//CallSequence(t.token, testRequests)
-	bHitAPILimit, bError = CallParallel(t.Token, testRequests)
+	bHitAPILimit, bError = CallParallel(t.Token, t.User, t.IsBasicAuth, testRequests)
 
 	for c, o := range testRequests {
 

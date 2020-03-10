@@ -166,8 +166,10 @@ var (
 
 type Collector struct {
 	//thousandEyes *ThousandEyes
+	IsBasicAuth bool
 	Token string
-	RefreshToken string
+	User string
+	//tbd: RefreshToken string
 	IsCollectBgp bool
 	IsCollectHttp bool
 	IsCollectHttpMetrics bool
@@ -209,10 +211,6 @@ func addStaticMetrics(ch chan<- prometheus.Metric){
 
 func collectAlerts(c Collector, ch chan<- prometheus.Metric) {
 
-	
-
-	ThousandRequestsTotalMetric.Inc()
-
 	t, bHitRateLimit, bError  :=  c.GetAlerts()
 
 	// hint for the limit
@@ -244,9 +242,7 @@ func collectAlerts(c Collector, ch chan<- prometheus.Metric) {
 
 		// skip thousandeyes_parsing_fails for non BGP alerts
 		mC := len(a[i].Monitors)
-		if mC == 0 {
-			log.Println("INFO: Alert Monitor Array is empty (only for BGP)")
-		} else {
+		if mC != 0 { //"INFO: Alert Monitor Array is empty for BGP"
 			rr := 1 - (a[i].ViolationCount / mC)
 
 			ch <- prometheus.MustNewConstMetric(
@@ -264,9 +260,7 @@ func collectAlerts(c Collector, ch chan<- prometheus.Metric) {
 }
 func collectTests(c Collector, ch chan<- prometheus.Metric) {
 
-
 	tBGP, tHTMLm, tHTMLw, bHitRateLimit, bError := c.GetTests()
-	ThousandRequestsTotalMetric.Inc()
 
 	// hint for the limit
 	if bHitRateLimit {
@@ -394,7 +388,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 
 	for e := range tHTMLw {
 		if len(tHTMLw[e].Web.HTTPServer) == 0 {
-			log.Println("INFO: HTML metrics are emptry for Test:", tHTMLw[e])
+			log.Println("INFO: HTML metrics are empty for Test:", tHTMLw[e])
 			continue
 		}
 		for i := range tHTMLw[e].Web.HTTPServer {
@@ -507,7 +501,11 @@ func (t Collector) Collect(ch chan<- prometheus.Metric) {
 	}()
 
 	collectAlerts(t, ch)
-	collectTests(t, ch)
+	if  t.IsCollectBgp ||
+		t.IsCollectHttp ||
+		t.IsCollectHttpMetrics {
+		collectTests(t, ch)
+	}
 
 
 	scrapeElapsed := time.Since(scrapeStart)
