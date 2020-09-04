@@ -8,6 +8,7 @@ RUN make build
 
 FROM alpine:3.8
 LABEL maintainer="tilo.geissler@sap.com" 
+LABEL source_repository="https://github.com/sapcc/1000eyes_exporter"
 
 RUN apk add --no-cache curl
 COPY --from=BUILDING_STEP /go/src/github.com/sapcc/1000eyes-exporter/bin/ /usr/local/bin/
