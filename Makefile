@@ -1,4 +1,4 @@
-IMAGE:=hub.global.cloud.sap/monsoon/1000eyes-exporter
+IMAGE:=keppel.eu-de-1.cloud.sap/ccloud/1000eyes-exporter
 VERSION_LATEST:=latest
 VERSION:=v0.0.5
 
