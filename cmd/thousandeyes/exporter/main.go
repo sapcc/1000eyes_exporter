@@ -4,7 +4,7 @@ import (
 	"flag"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/sapcc/1000eyes_exporter/pkg/thousandeyes"
+	thousandeyes "github.com/sapcc/1000eyes_exporter/pkg/thousandeyes"
 	"log"
 	"net/http"
 	"os"

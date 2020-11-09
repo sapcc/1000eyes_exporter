@@ -25,100 +25,100 @@ var (
 	ThousandTestBGPReachabilityDesc = prometheus.NewDesc(
 		"thousandeyes_test_bgp_reachability_percentage",
 		"BGP test ran in ThousandEyes - metric: reachability.",
-		[]string{"id", "test_name", "type", "prefix", "country", "monitor_name"},
+		[]string{"test_id", "test_name", "type", "prefix", "country", "monitor_name"},
 		nil)
 	//ThousandTestBGPUpdatesDesc
 	ThousandTestBGPUpdatesDesc = prometheus.NewDesc(
 		"thousandeyes_test_bgp_updates",
 		"BGP test ran in ThousandEyes - metric: updates.",
-		[]string{"id", "test_name", "type", "prefix", "country", "monitor_name"},
+		[]string{"test_id", "test_name", "type", "prefix", "country", "monitor_name"},
 		nil)
 	ThousandTestBGPPathChangesDesc = prometheus.NewDesc(
 		"thousandeyes_test_bgp_path_changes",
 		"BGP test ran in ThousandEyes - metric: pathChanges.",
-		[]string{"id", "test_name", "type", "prefix", "country", "monitor_name"},
+		[]string{"test_id", "test_name", "type", "prefix", "country", "monitor_name"},
 		nil)
 
 	// - html tests web
 	ThousandTestHTMLconnectTimeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_avg_connect_time_milliseconds",
 		"HTML test ran in ThousandEyes - metric: connectTime.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLDNSTimeDesc
 	ThousandTestHTMLDNSTimeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_avg_dns_time_milliseconds",
 		"HTML test ran in ThousandEyes - metric: dnsTime.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLRedirectsDesc
 	ThousandTestHTMLRedirectsDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_num_redirects",
 		"HTML test ran in ThousandEyes - metric: NumRedirects.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLreceiveTimeDesc
 	ThousandTestHTMLreceiveTimeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_receiveTime_milliseconds",
 		"HTML test ran in ThousandEyes - metric: receiveTime.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLresponseCodeDesc
 	ThousandTestHTMLresponseCodeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_response_code",
 		"HTML test ran in ThousandEyes - metric: responseCode.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	ThousandTestHTMLresponseTimeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_response_time_milliseconds",
 		"HTML test ran in ThousandEyes - metric: responseTime.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLTotalTimeDesc
 	ThousandTestHTMLTotalTimeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_total_time_milliseconds",
 		"HTML test ran in ThousandEyes - metric: totalTime.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	ThousandTestHTMLwaitTimeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_wait_time_milliseconds",
 		"HTML test ran in ThousandEyes - metric: waitTime.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	ThousandTestHTMLwireSizeDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_wire_size_byte",
 		"HTML test ran in ThousandEyes - metric: wireSize.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 
 	// - html tests metrics
 	ThousandTestHTMLLossDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_loss_percentage",
 		"HTML test ran in ThousandEyes - metric: loss.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLAvgLatencyDesc
 	ThousandTestHTMLAvgLatencyDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_avg_latency_milliseconds",
 		"HTML test ran in ThousandEyes - metric: avgLatency.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLMinLatencyDesc
 	ThousandTestHTMLMinLatencyDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_min_latency_milliseconds",
 		"HTML test ran in ThousandEyes - metric: minLatency.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	ThousandTestHTMLMaxLatencyDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_max_latency_milliseconds",
 		"HTML test ran in ThousandEyes - metric: maxLatency.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 	//ThousandTestHTMLJitterDesc
 	ThousandTestHTMLJitterDesc = prometheus.NewDesc(
 		"thousandeyes_test_html_jitter_milliseconds",
 		"HTML test ran in ThousandEyes - metric: jitter.",
-		[]string{"test_name", "type", "prefix", "country", "agent_name"},
+		[]string{"test_id","test_name", "type", "prefix", "country", "agent_name"},
 		nil)
 
 	// fixed metrics
@@ -292,7 +292,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestBGPReachabilityDesc,
 				prometheus.GaugeValue,
 				float64(tBGP[e].Net.BgpMetrics[i].Reachability),
-				fmt.Sprintf("%d-%d", tBGP[e].Net.Test.TestID, i),
+				fmt.Sprintf("%d", tBGP[e].Net.Test.TestID),
 				tBGP[e].Net.Test.TestName,
 				tBGP[e].Net.Test.Type,
 				tBGP[e].Net.BgpMetrics[i].Prefix,
@@ -303,7 +303,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestBGPUpdatesDesc,
 				prometheus.GaugeValue,
 				float64(tBGP[e].Net.BgpMetrics[i].Updates),
-				string(tBGP[e].Net.Test.TestID),
+				fmt.Sprintf("%d", tBGP[e].Net.Test.TestID),
 				tBGP[e].Net.Test.TestName,
 				tBGP[e].Net.Test.Type,
 				tBGP[e].Net.BgpMetrics[i].Prefix,
@@ -337,6 +337,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLAvgLatencyDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLm[e].Net.HTTPMetrics[i].AvgLatency),
+				fmt.Sprintf("%d", tHTMLm[e].Net.Test.TestID),
 				tHTMLm[e].Net.Test.TestName,
 				tHTMLm[e].Net.Test.Type,
 				tHTMLm[e].Net.Test.Prefix,
@@ -347,6 +348,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLMinLatencyDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLm[e].Net.HTTPMetrics[i].MinLatency),
+				fmt.Sprintf("%d", tHTMLm[e].Net.Test.TestID),
 				tHTMLm[e].Net.Test.TestName,
 				tHTMLm[e].Net.Test.Type,
 				tHTMLm[e].Net.Test.Prefix,
@@ -357,6 +359,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLMaxLatencyDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLm[e].Net.HTTPMetrics[i].MaxLatency),
+				fmt.Sprintf("%d", tHTMLm[e].Net.Test.TestID),
 				tHTMLm[e].Net.Test.TestName,
 				tHTMLm[e].Net.Test.Type,
 				tHTMLm[e].Net.Test.Prefix,
@@ -367,6 +370,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLLossDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLm[e].Net.HTTPMetrics[i].Loss),
+				fmt.Sprintf("%d", tHTMLm[e].Net.Test.TestID),
 				tHTMLm[e].Net.Test.TestName,
 				tHTMLm[e].Net.Test.Type,
 				tHTMLm[e].Net.Test.Prefix,
@@ -377,6 +381,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLJitterDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLm[e].Net.HTTPMetrics[i].Jitter),
+				fmt.Sprintf("%d", tHTMLm[e].Net.Test.TestID),
 				tHTMLm[e].Net.Test.TestName,
 				tHTMLm[e].Net.Test.Type,
 				tHTMLm[e].Net.Test.Prefix,
@@ -397,6 +402,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLconnectTimeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].ConnectTime),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -407,6 +413,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLDNSTimeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].DNSTime),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -417,6 +424,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLRedirectsDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].NumRedirects),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -427,6 +435,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLreceiveTimeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].ReceiveTime),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -437,6 +446,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLresponseCodeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].ResponseCode),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -447,6 +457,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLresponseTimeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].ResponseTime),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -457,6 +468,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLTotalTimeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].TotalTime),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -467,6 +479,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLwaitTimeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].WaitTime),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
@@ -477,6 +490,7 @@ func collectTests(c Collector, ch chan<- prometheus.Metric) {
 				ThousandTestHTMLwireSizeDesc,
 				prometheus.GaugeValue,
 				float64(tHTMLw[e].Web.HTTPServer[i].WireSize),
+				fmt.Sprintf("%d", tHTMLw[e].Web.Test.TestID),
 				tHTMLw[e].Web.Test.TestName,
 				tHTMLw[e].Web.Test.Type,
 				tHTMLw[e].Web.Test.Prefix,
